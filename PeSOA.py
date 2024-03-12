@@ -14,8 +14,8 @@ penguins = 10
 waddle = []
 generations = 100
 oxygen = 10
-n = int(random.random() * MAX % 10) + 1
-m = int(random.random() * MAX % 10) + 1
+n = 10#int(random.random() * MAX % 10) + 1
+m = 5#int(random.random() * MAX % 10) + 1
 
 #Penguin class that has a solution, best solution, and makespan. solution and best
 #are permutations of the jobs and makespan is an integer representing the time for
@@ -98,6 +98,7 @@ def getNewSolution(p, b):
         p.solution = current
         if(p.makespan > makespan(jobs, p.solution, n-1, m-1)):
             p.best = p.solution
+            best = p.best
         
         loop -= 1
     
@@ -119,6 +120,10 @@ for i in range(n):
     bestSol.append(i)
 bestSpan = makespan(jobs, bestSol, n-1, m-1)
     
+one = 0
+ten = 0
+hundred = 0
+
 #Tests each penguin for the specified number of generations
 for g in range(generations):
     #First finds the makespan of all the penguins and keeps the best solution
@@ -127,6 +132,9 @@ for g in range(generations):
         if p.makespan < bestSpan:
             bestSol = p.solution
             bestSpan = p.makespan
+    if g == 0: one = bestSpan
+    if g == 9: ten = bestSpan
+    if g == 99: hundred = bestSpan
             
     #Prints each penguin's info then gives it a new solution based on the current best solution.
     i = 1
@@ -137,3 +145,7 @@ for g in range(generations):
         p.makespan = makespan(jobs, p.solution, n-1, m-1)
 
     print("Best makespan so far:", bestSpan, "\n")
+
+print("Best Makespan Generation 1:", one)
+print("Best Makespan Generation 10:", ten)
+print("Best Makespan Generation 100:", hundred)
