@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
     Genetic Algorithm for the Flow-Shop Scheduling Problem
-     Based off the article "Adaptive genetic algorithm for 
-     two-stage hybrid flow-shop scheduling with sequence-
-     independent setup time and no-interruption requirement" 
-     by Yan Qiao, NaiQi Wu, YunFang He, ZhiWu Li, Tao Chen
+      Based off the article "Adaptive genetic algorithm for 
+      two-stage hybrid flow-shop scheduling with sequence-
+      independent setup time and no-interruption requirement" 
+      by Yan Qiao, NaiQi Wu, YunFang He, ZhiWu Li, Tao Chen
 '''
 import random
 
@@ -18,16 +18,21 @@ MUTATION_RATE_1 = 0.03
 MUTATION_RATE_2 = 1.0
 DIVERSITY_THRESHOLD = 0.8
 STABILITY_THRESHOLD = 0.8
+MIN_TIME = 1
+MAX_TIME = 10
+
+def generate_processing_times():
+    return [random.randint(MIN_TIME, MAX_TIME) for _ in range(NUM_MACHINES)]
 
 # Generate random initial population
 def generate_initial_population():
     population = []
     for _ in range(POPULATION_SIZE):
         chromosome = []
-        order = []
-        # Generate the order of machines to go through for each job
         for _ in range(NUM_JOBS):
-            chromosome.append(random.sample(range(NUM_MACHINES), NUM_MACHINES))
+            # Generate random processing times for each job on each machine
+            processing_times = generate_processing_times()
+            chromosome.append(processing_times)
         population.append(chromosome)
     return population
 
@@ -57,7 +62,7 @@ def crossover(parent1, parent2, probability=CROSSOVER_RATE):
 def mutate(chromosome , probability=MUTATION_RATE_1):
     for i in range(len(chromosome)):
         if probability > random.random():
-            chromosome[i] = random.sample(range(NUM_MACHINES), NUM_MACHINES)
+            chromosome[i] = generate_processing_times()
     return chromosome
 
 # Calculate the distance between two chromosomes
@@ -78,6 +83,7 @@ def genetic_algorithm():
     # Generate initial population
     population = generate_initial_population()
     diversity_scores = []
+    fitness_scores = []
     
     # Evolution loop
     for generation in range(NUM_GENERATIONS):
@@ -89,13 +95,6 @@ def genetic_algorithm():
         diversity_avg = sum(diversity_scores) / len(diversity_scores) if diversity_scores else 0
         diversity_scores.append(diversity)
         diversity_stability = sum([1 for score in diversity_scores if abs(score - diversity_avg) <= 0.05]) / len(diversity_scores)
-        
-        # Print statistics
-        print("Generation ", generation, ": ", fitness_scores)
-        print("Minimum fitness: ", min(fitness_scores))
-        print("Diversity: ", diversity)
-        print("Diversity average: ", diversity_avg)
-        print("Diversity stability: ", diversity_stability)
         
         # Select parents for crossover
         parents = random.choices(population, weights=[1 / (fitness + 1) for fitness in fitness_scores], k=2)
@@ -123,7 +122,7 @@ def genetic_algorithm():
         
         # Replace old population with new generation
         population = offspring
-        print()
+        # print()
     
     # Select best solution from final population
     best_solution = min(population, key=calculate_fitness)
@@ -131,6 +130,18 @@ def genetic_algorithm():
     
     return best_solution, best_fitness
 
-best_solution, best_fitness = genetic_algorithm()
-print("Best solution:", best_solution)
-print("Best fitness:", best_fitness)
+solutions = []
+fitness_scores = []
+for i in range(10):
+    print("Trial ", i + 1, ":")
+    best_solution, best_fitness = genetic_algorithm()
+    solutions.append(best_solution)
+    fitness_scores.append(best_fitness)
+    print("Best solution:", best_solution)
+    print("Best fitness:", best_fitness)
+    print()
+
+best_solution = min(solutions, key=calculate_fitness)
+best_fitness = min(fitness_scores)
+print("Best overall solution:", best_solution)
+print("Best overall fitness:", best_fitness)
