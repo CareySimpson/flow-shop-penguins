@@ -7,10 +7,11 @@
       by Yan Qiao, NaiQi Wu, YunFang He, ZhiWu Li, Tao Chen
 '''
 import random
+import math
 
 # Define parameters
-NUM_JOBS = 30
-NUM_MACHINES = 2
+NUM_JOBS = 20
+NUM_MACHINES = 8
 POPULATION_SIZE = 10
 NUM_GENERATIONS = 100
 CROSSOVER_RATE = 0.8
@@ -95,6 +96,15 @@ def genetic_algorithm():
         diversity_avg = sum(diversity_scores) / len(diversity_scores) if diversity_scores else 0
         diversity_scores.append(diversity)
         diversity_stability = sum([1 for score in diversity_scores if abs(score - diversity_avg) <= 0.05]) / len(diversity_scores)
+
+        # Print statistics
+        if math.log10(generation+1) % 1 == 0:
+            print("Generation ", generation+1, ":", fitness_scores)
+            print("Best Fitness: ", min(fitness_scores))
+            print("Diversity: ", diversity)
+            print("Diversity Average: ", diversity_avg)
+            print("Diversity Stability: ", diversity_stability)
+            print()
         
         # Select parents for crossover
         parents = random.choices(population, weights=[1 / (fitness + 1) for fitness in fitness_scores], k=2)
@@ -122,7 +132,6 @@ def genetic_algorithm():
         
         # Replace old population with new generation
         population = offspring
-        # print()
     
     # Select best solution from final population
     best_solution = min(population, key=calculate_fitness)
@@ -130,18 +139,8 @@ def genetic_algorithm():
     
     return best_solution, best_fitness
 
-solutions = []
-fitness_scores = []
-for i in range(10):
-    print("Trial ", i + 1, ":")
-    best_solution, best_fitness = genetic_algorithm()
-    solutions.append(best_solution)
-    fitness_scores.append(best_fitness)
-    print("Best solution:", best_solution)
-    print("Best fitness:", best_fitness)
-    print()
-
-best_solution = min(solutions, key=calculate_fitness)
-best_fitness = min(fitness_scores)
-print("Best overall solution:", best_solution)
-print("Best overall fitness:", best_fitness)
+print("Number of Jobs:", NUM_JOBS)
+print("Number of Machines:", NUM_MACHINES)
+best_solution, best_fitness = genetic_algorithm()
+print("Best solution:", best_solution)
+print("Best fitness:", best_fitness)
